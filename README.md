@@ -1,4 +1,4 @@
-# Naver Weather Card
+# Naver Weather Card for Home Assistant
 
 Home Assistant용 네이버 날씨 커스텀 카드입니다.  
 [Naver Weather](https://github.com/af950833/naver_weather) 통합에서 생성한 날씨/예보/대기질 센서를 한 카드에 보기 좋게 표시합니다.
