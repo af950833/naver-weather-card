@@ -123,26 +123,6 @@ show_air_quality: true
 | 상세 날씨 정보 | 해당 날씨 센서 |
 | 대기질 정보 | 해당 대기질 센서 |
 
-## 스크린샷 넣는 방법
-
-README에 이미 아래 이미지 경로가 들어가 있습니다.
-
-```text
-images/card-desktop.png
-images/card-mobile.png
-images/card-editor.png
-```
-
-GitHub 저장소에 같은 이름으로 이미지를 추가하면 README에 자동으로 표시됩니다.
-
-권장 크기:
-
-- `card-desktop.png`: 데스크톱 카드 전체 화면
-- `card-mobile.png`: 모바일 폭에서의 카드 화면
-- `card-editor.png`: 비주얼 에디터 화면
-
-이미지 파일명은 바꿔도 되지만, 바꾸면 README의 이미지 링크도 같이 수정해야 합니다.
-
 ## 문제 해결
 
 ### 카드가 보이지 않음
@@ -158,9 +138,7 @@ GitHub 저장소에 같은 이름으로 이미지를 추가하면 README에 자�
 - 카드의 `entity`가 올바른 `weather.naver_weather_*` 엔티티인지 확인하세요.
 - 카드가 같은 prefix의 센서를 찾을 수 있어야 합니다.
 
-## 라이선스와 감사
+## 라이선스
 
 이 카드는 [Naver Weather](https://github.com/af950833/naver_weather) 통합과 함께 사용하기 위해 제작되었습니다.
 
-Naver Weather 통합은 [miumida/naver_weather](https://github.com/miumida/naver_weather)를 기반으로 수정한 포크입니다.  
-원작자인 [@miumida](https://github.com/miumida)님과 Home Assistant 커뮤니티에 감사드립니다.
