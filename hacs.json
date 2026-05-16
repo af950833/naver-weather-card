@@ -1,0 +1,7 @@
+{
+  "name": "Naver Weather Card",
+  "filename": "naver-weather-card.js",
+  "country": "KR",
+  "homeassistant": "2024.1.0",
+  "render_readme": true
+}
