@@ -8,19 +8,7 @@ Home Assistant용 네이버 날씨 커스텀 카드입니다.
 
 ## 미리보기
 
-> 아래 이미지 파일을 저장소의 `images/` 폴더에 넣으면 GitHub와 HACS README에서 함께 표시됩니다.
-
-### 데스크톱
-
 ![Naver Weather Card desktop preview](images/card-desktop.png)
-
-### 모바일
-
-![Naver Weather Card mobile preview](images/card-mobile.png)
-
-### 비주얼 에디터
-
-![Naver Weather Card editor preview](images/card-editor.png)
 
 ## 주요 기능
 
