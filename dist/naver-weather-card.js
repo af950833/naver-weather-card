@@ -77,7 +77,6 @@ class NaverWeatherCard extends HTMLElement {
     const condition = weather.state || this.attr("weekly_forecast_1", "condition_pm", "sunny");
     const conditionText = this.state("current_condition", this.localizeCondition(condition));
     const summary = this.state("current_summary", "");
-    const sunTimes = this.state("sun_times", "");
     const temp = this.readNumber(this.state("temperature", weather.attributes?.temperature));
     const feelsLike = this.readNumber(this.state("feels_like_temperature", ""));
     const high = this.readNumber(this.state("today_high_temperature", weather.attributes?.temperature));
@@ -101,12 +100,6 @@ class NaverWeatherCard extends HTMLElement {
               <div class="condition">${this.escape(conditionText)}</div>
               <div class="place">${this.escape(location)}</div>
               ${summary ? `<div class="summary">${this.escape(summary)}</div>` : ""}
-              ${sunTimes ? `
-                <div class="sun-times" data-entity="${this.escape(this.sensorId("sun_times"))}">
-                  <ha-icon icon="mdi:weather-sunset"></ha-icon>
-                  <span>${this.escape(sunTimes)}</span>
-                </div>
-              ` : ""}
             </div>
             <div class="temperature">
               <div class="temp-line" data-entity="${this.escape(this.sensorId("temperature"))}">
@@ -205,12 +198,19 @@ class NaverWeatherCard extends HTMLElement {
         grade: this.state("ultra_fine_dust_grade", ""),
         entityId: this.sensorId("ultra_fine_dust"),
       },
-      { label: "통합대기", value: this.state("comprehensive_air_quality_grade"), icon: "mdi:air-filter", entityId: this.sensorId("comprehensive_air_quality_grade") },
       { label: "오존", value: this.state("ozone_grade"), icon: "mdi:alpha-o-circle", entityId: this.sensorId("ozone_grade") },
       { label: "일산화탄소", value: this.state("carbon_monoxide_grade"), icon: "mdi:molecule-co", entityId: this.sensorId("carbon_monoxide_grade") },
       { label: "아황산가스", value: this.state("sulfur_dioxide_grade"), icon: "mdi:alpha-s-circle", entityId: this.sensorId("sulfur_dioxide_grade") },
       { label: "이산화질소", value: this.state("nitrogen_dioxide_grade"), icon: "mdi:alpha-n-circle", entityId: this.sensorId("nitrogen_dioxide_grade") },
+      { label: "통합대기", value: this.state("comprehensive_air_quality_grade"), icon: "mdi:air-filter", entityId: this.sensorId("comprehensive_air_quality_grade") },
+      { label: "일출/일몰", value: this.sunTimeValue(), icon: "mdi:weather-sunset", entityId: this.sensorId("sun_times") },
     ];
+  }
+
+  sunTimeValue() {
+    const value = this.state("sun_times");
+    const match = String(value || "").match(/\d{1,2}:\d{2}/);
+    return match ? match[0] : value;
   }
 
   renderForecast(item) {
@@ -242,6 +242,7 @@ class NaverWeatherCard extends HTMLElement {
     if (icon.includes("water-percent")) return "humidity";
     if (icon.includes("pouring") || icon.includes("rainy")) return "rain";
     if (icon.includes("windy") || icon.includes("windsock")) return "wind";
+    if (icon.includes("sunset")) return "sun";
     if (icon.includes("white-balance-sunny")) return "sun";
     return "default";
   }
@@ -421,22 +422,6 @@ class NaverWeatherCard extends HTMLElement {
           color: var(--secondary-text-color);
           font-size: 13px;
           line-height: 1.3;
-        }
-
-        .sun-times {
-          display: inline-flex;
-          align-items: center;
-          gap: 4px;
-          margin-top: 4px;
-          color: var(--secondary-text-color);
-          cursor: pointer;
-          font-size: 12px;
-          line-height: 1.2;
-        }
-
-        .sun-times ha-icon {
-          --mdc-icon-size: 15px;
-          color: #f59f00;
         }
 
         .temperature {
