@@ -129,13 +129,13 @@ class NaverWeatherCard extends HTMLElement {
 
           ${this.config.show_details === false ? "" : `
             <section class="details">
-              ${detailItems.map((item) => this.renderMetric(item)).join("")}
+              ${detailItems.map((item, index) => this.renderMetric(item, index)).join("")}
             </section>
           `}
 
           ${this.config.show_air_quality === false ? "" : `
             <section class="air">
-              ${airItems.map((item) => this.renderMetric(item)).join("")}
+              ${airItems.map((item, index) => this.renderMetric(item, index)).join("")}
             </section>
           `}
         </button>
@@ -179,7 +179,7 @@ class NaverWeatherCard extends HTMLElement {
   detailItems() {
     return [
       { label: "습도", value: this.state("humidity"), unit: "%", icon: "mdi:water-percent", entityId: this.sensorId("humidity") },
-      { label: "강수", value: this.state("rain_probability"), unit: "%", icon: "mdi:weather-pouring", entityId: this.sensorId("rain_probability") },
+      { label: "강수확률", value: this.state("rain_probability"), unit: "%", icon: "mdi:weather-pouring", entityId: this.sensorId("rain_probability") },
       { label: "강수량", value: this.state("rainfall"), unit: "mm", icon: "mdi:weather-rainy", entityId: this.sensorId("rainfall") },
       { label: "풍속", value: this.state("wind_speed"), unit: "m/s", icon: "mdi:weather-windy", entityId: this.sensorId("wind_speed") },
       { label: "풍향", value: this.state("wind_bearing"), unit: "", icon: "mdi:windsock", entityId: this.sensorId("wind_bearing") },
@@ -192,20 +192,20 @@ class NaverWeatherCard extends HTMLElement {
       {
         label: "미세먼지",
         value: this.state("fine_dust"),
-        unit: "㎍/㎥",
+        unit: "",
         icon: "mdi:blur",
+        grade: this.state("fine_dust_grade", ""),
         entityId: this.sensorId("fine_dust"),
       },
       {
         label: "초미세먼지",
         value: this.state("ultra_fine_dust"),
-        unit: "㎍/㎥",
+        unit: "",
         icon: "mdi:blur-linear",
+        grade: this.state("ultra_fine_dust_grade", ""),
         entityId: this.sensorId("ultra_fine_dust"),
       },
       { label: "통합대기", value: this.state("comprehensive_air_quality_grade"), icon: "mdi:air-filter", entityId: this.sensorId("comprehensive_air_quality_grade") },
-      { label: "미세먼지", value: this.state("fine_dust_grade"), icon: "mdi:blur", entityId: this.sensorId("fine_dust_grade") },
-      { label: "초미세먼지", value: this.state("ultra_fine_dust_grade"), icon: "mdi:blur-linear", entityId: this.sensorId("ultra_fine_dust_grade") },
       { label: "오존", value: this.state("ozone_grade"), icon: "mdi:alpha-o-circle", entityId: this.sensorId("ozone_grade") },
       { label: "일산화탄소", value: this.state("carbon_monoxide_grade"), icon: "mdi:molecule-co", entityId: this.sensorId("carbon_monoxide_grade") },
       { label: "아황산가스", value: this.state("sulfur_dioxide_grade"), icon: "mdi:alpha-s-circle", entityId: this.sensorId("sulfur_dioxide_grade") },
@@ -224,16 +224,15 @@ class NaverWeatherCard extends HTMLElement {
     `;
   }
 
-  renderMetric(item) {
-    const value = `${this.escape(item.value)}${item.unit ? `<span>${this.escape(item.unit)}</span>` : ""}`;
+  renderMetric(item, index = 0) {
+    const value = `${this.escape(item.value)}${item.unit ? `<span>${this.escape(item.unit)}</span>` : ""}${item.grade ? ` <span class="metric-grade">${this.escape(item.grade)}</span>` : ""}`;
     const tone = this.metricTone(item);
+    const side = index % 2 === 0 ? "left" : "right";
     return `
-      <div class="metric tone-${tone} quality-${this.gradeKey(item.value)}" data-entity="${this.escape(item.entityId)}">
+      <div class="metric metric-${side} tone-${tone} quality-${this.gradeKey(item.grade || item.value)}" data-entity="${this.escape(item.entityId)}">
         <ha-icon icon="${item.icon}"></ha-icon>
-        <div>
-          <div class="metric-label">${this.escape(item.label)}</div>
-          <div class="metric-value">${value}</div>
-        </div>
+        <span class="metric-label">${this.escape(item.label)}</span>
+        <span class="metric-value">${value}</span>
       </div>
     `;
   }
@@ -529,33 +528,39 @@ class NaverWeatherCard extends HTMLElement {
         .details,
         .air {
           display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 8px;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          column-gap: 24px;
+          row-gap: 6px;
+        }
+
+        .details {
           margin-top: 16px;
           padding-top: 14px;
           border-top: 1px solid var(--divider-color);
         }
 
+        .air {
+          margin-top: 6px;
+        }
+
         .metric {
           min-width: 0;
           display: grid;
-          grid-template-columns: 24px minmax(0, 1fr) auto;
+          grid-template-columns: 22px minmax(0, 1fr) auto;
           align-items: center;
-          gap: 8px;
-          padding: 8px;
-          border-radius: 8px;
-          background: color-mix(in srgb, var(--primary-text-color) 4%, transparent);
+          gap: 6px;
+          padding: 1px 0;
           cursor: pointer;
-          transition: background 120ms ease, transform 120ms ease;
+          line-height: 1.25;
+          transition: opacity 120ms ease;
         }
 
         .metric:active {
-          transform: scale(0.98);
-          background: color-mix(in srgb, var(--primary-text-color) 8%, transparent);
+          opacity: 0.72;
         }
 
         .metric ha-icon {
-          --mdc-icon-size: 21px;
+          --mdc-icon-size: 18px;
           color: var(--secondary-text-color);
         }
 
@@ -577,8 +582,8 @@ class NaverWeatherCard extends HTMLElement {
 
         .metric-label {
           overflow: hidden;
-          color: var(--secondary-text-color);
-          font-size: 12px;
+          color: var(--primary-text-color);
+          font-size: 13px;
           line-height: 1.2;
           text-overflow: ellipsis;
           white-space: nowrap;
@@ -586,8 +591,7 @@ class NaverWeatherCard extends HTMLElement {
 
         .metric-value {
           overflow: hidden;
-          margin-top: 1px;
-          font-size: 14px;
+          font-size: 13px;
           font-weight: 600;
           line-height: 1.2;
           text-overflow: ellipsis;
@@ -601,15 +605,25 @@ class NaverWeatherCard extends HTMLElement {
           font-weight: 400;
         }
 
+        .metric-value .metric-grade {
+          margin-left: 4px;
+          color: inherit;
+          font-size: inherit;
+          font-weight: inherit;
+        }
+
         .quality-good ha-icon {
-          color: #2f9e44;
+          color: #228be6;
         }
 
         .quality-normal ha-icon {
+          color: #2f9e44;
+        }
+
+        .quality-bad ha-icon {
           color: #f59f00;
         }
 
-        .quality-bad ha-icon,
         .quality-very-bad ha-icon {
           color: #e03131;
         }
@@ -648,16 +662,17 @@ class NaverWeatherCard extends HTMLElement {
 
           .details,
           .air {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 6px;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            column-gap: 18px;
+            row-gap: 6px;
           }
 
           .details .metric,
           .air .metric {
-            grid-template-columns: 20px minmax(0, 1fr) auto;
-            gap: 6px;
-            padding: 7px 6px;
+            grid-template-columns: 18px minmax(0, 1fr) auto;
+            gap: 5px;
           }
+
         }
       </style>
     `;
